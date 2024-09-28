@@ -95,7 +95,7 @@ $ ./hello
 hello, world
 If you see the "hello, world" message then your Go installation is working.
 
-You can run go install to install the binary into your workspace's bin directory or go clean -i to remove it.
+You can run go install to install the binary into your workspace's bin directory or go clean -index to remove it.
 
 Before rushing off to write Go code please read the How to Write Go Code document, which describes some essential concepts about using the Go tools.
 

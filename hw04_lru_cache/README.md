@@ -15,8 +15,8 @@ nil <- (prev) front <-> ... <-> elem <-> ... <-> back (next) -> nil
 - Back() *ListItem                    // последний элемент списка
 - PushFront(v interface{}) *ListItem  // добавить значение в начало
 - PushBack(v interface{}) *ListItem   // добавить значение в конец
-- Remove(i *ListItem)                 // удалить элемент
-- MoveToFront(i *ListItem)            // переместить элемент в начало
+- Remove(index *ListItem)                 // удалить элемент
+- MoveToFront(index *ListItem)            // переместить элемент в начало
 
 **Считаем, что методы Remove и MoveToFront вызываются только от существующих в списке элементов.**
 
