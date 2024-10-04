@@ -1,4 +1,4 @@
-module github.com/Lawitz2/Otus/tree/master/hw01_hello_otus
+module github.com/Lawitz2/Otus/hw01_hello_otus
 
 go 1.23.1
 
