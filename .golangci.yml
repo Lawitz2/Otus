@@ -22,6 +22,7 @@ linters:
   disable-all: true
   enable:
     - asciicheck
+    - copyloopvar
     - depguard
     - dogsled
     - dupl
@@ -29,7 +30,6 @@ linters:
     - durationcheck
     - errorlint
     - exhaustive
-    - exportloopref
     - funlen
     - gci
     - gocognit
