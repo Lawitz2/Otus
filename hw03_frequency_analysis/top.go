@@ -12,7 +12,7 @@ func Top10(text string) []string {
 	slices.Sort(textSlice)
 
 	for _, val := range textSlice {
-		freqMap[val] += 1
+		freqMap[val]++
 	}
 
 	freqSlice := make([]int, 0, len(freqMap))
