@@ -10,13 +10,14 @@ var regWords = regexp.MustCompile(`(?:[a-zа-я]+[[:punct:]]*)+[a-zа-я]+`)
 
 func Top10(text string) []string {
 	text = strings.ToLower(text)
-
 	textSlc := strings.Fields(text)
 	freqMap := make(map[string]int)
+
 	for _, v := range textSlc {
 		if v == "-" {
 			continue
 		}
+
 		switch {
 		case regWords.MatchString(v):
 			freqMap[regWords.FindString(v)]++
@@ -26,9 +27,11 @@ func Top10(text string) []string {
 	}
 
 	appearancesSlc := make([]int, 0, len(freqMap))
+
 	for _, val := range freqMap {
 		appearancesSlc = append(appearancesSlc, val)
 	}
+
 	slices.SortFunc(appearancesSlc, func(a, b int) int {
 		return b - a
 	})
@@ -47,5 +50,6 @@ func Top10(text string) []string {
 		slices.Sort(resSlice[i:])
 		i += k
 	}
+
 	return resSlice[:min(len(resSlice), 10)]
 }

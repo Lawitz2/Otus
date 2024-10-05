@@ -1,4 +1,4 @@
-package hw03frequencyanalysis
+package hw03frequencyanalysis //nolint:gci,nolintlint // formatting of the test is fine as is
 
 import (
 	"testing"
