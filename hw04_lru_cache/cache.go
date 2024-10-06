@@ -16,6 +16,18 @@ type lruCache struct {
 	items    map[Key]*ListItem
 }
 
+func (l *lruCache) Set(key Key, val interface{}) bool {
+
+}
+
+func (l *lruCache) Get(key Key) (interface{}, bool) {
+
+}
+
+func (l *lruCache) Clear() {
+
+}
+
 func NewCache(capacity int) Cache {
 	return &lruCache{
 		capacity: capacity,
