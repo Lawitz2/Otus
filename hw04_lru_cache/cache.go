@@ -30,12 +30,12 @@ func (l *lruCache) Set(key Key, val interface{}) bool {
 	}
 	if l.queue.Len() == l.capacity {
 		delete(l.items, l.queue.Back().ItemKey)
-		//for mapKey, item := range l.items {
+		// for mapKey, item := range l.items {
 		//	if l.queue.Back() == item {
 		//		delete(l.items, mapKey)
 		//		break
 		//	}
-		//}
+		// }
 		l.queue.Remove(l.queue.Back())
 	}
 	l.queue.PushFront(val)

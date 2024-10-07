@@ -51,6 +51,7 @@ func TestCache(t *testing.T) {
 		c.Clear() // new test
 		val, ok = c.Get("aaa")
 		require.False(t, ok)
+		require.Nil(t, val)
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
@@ -72,6 +73,7 @@ func TestCache(t *testing.T) {
 		c.Set("f", 12) // [f:12, e:10, d:8, a:2]
 
 		val, ok = c.Get("c") // [f:12, e:10, d:8, a:2]
+		require.Nil(t, val)
 		require.Equal(t, false, ok)
 
 		ok = c.Set("a", 14) // [a:14, f:12, e:10, d:8]
@@ -82,6 +84,7 @@ func TestCache(t *testing.T) {
 		c.Set("g", 16) // [g:16, e:10, d:8, a:14]
 
 		val, ok = c.Get("f") // [g:16, e:10, d:8, a:14]
+		require.Nil(t, val)
 		require.Equal(t, false, ok)
 	})
 }
