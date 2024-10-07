@@ -47,10 +47,42 @@ func TestCache(t *testing.T) {
 		val, ok = c.Get("ccc")
 		require.False(t, ok)
 		require.Nil(t, val)
+
+		c.Clear() // new test
+		val, ok = c.Get("aaa")
+		require.False(t, ok)
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		c := NewCache(4)
+		c.Set("a", 2)
+		c.Set("b", 4)
+		c.Set("c", 6)
+		c.Set("d", 8) // [d:8, c:6, b:4, a:2]
+
+		val, ok := c.Get("a") // [a:2, d:8, c:6, b:4]
+		require.Equal(t, 2, val)
+		require.Equal(t, true, ok)
+
+		val, ok = c.Get("d") // [d:8, a:2, c:6, b:4]
+		require.Equal(t, 8, val)
+		require.Equal(t, true, ok)
+
+		c.Set("e", 10) // [e:10, d:8, a:2, c:6]
+		c.Set("f", 12) // [f:12, e:10, d:8, a:2]
+
+		val, ok = c.Get("c") // [f:12, e:10, d:8, a:2]
+		require.Equal(t, false, ok)
+
+		ok = c.Set("a", 14) // [a:14, f:12, e:10, d:8]
+		require.Equal(t, true, ok)
+
+		c.Get("d")     // [d:8, a:14, f:12, e:10]
+		c.Get("e")     // [e:10, d:8, a:14, f:12]
+		c.Set("g", 16) // [g:16, e:10, d:8, a:14]
+
+		val, ok = c.Get("f") // [g:16, e:10, d:8, a:14]
+		require.Equal(t, false, ok)
 	})
 }
 

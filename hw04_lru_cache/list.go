@@ -65,10 +65,18 @@ func (l *list) PushBack(v interface{}) *ListItem {
 }
 
 func (l *list) Remove(i *ListItem) {
-	if i.Next != nil {
+	switch {
+	case l.Len() == 1: // if we're deleting the only item in the list
+		l.FrontNode = nil
+		l.BackNode = nil
+	case i.Next == nil: // if we're deleting the Back node
+		i.Prev.Next = nil
+		l.BackNode = i.Prev
+	case i.Prev == nil: // if we're deleting the Front node
+		i.Next.Prev = nil
+		l.FrontNode = i.Next
+	default: // If we're deleting a node from the middle
 		i.Next.Prev = i.Prev
-	}
-	if i.Prev != nil {
 		i.Prev.Next = i.Next
 	}
 	l.ListLen--
@@ -77,13 +85,13 @@ func (l *list) Remove(i *ListItem) {
 func (l *list) MoveToFront(i *ListItem) {
 	l.PushFront(i.Value)
 	l.Remove(i)
-	l.ListLen--
 }
 
 type ListItem struct {
-	Value interface{}
-	Next  *ListItem
-	Prev  *ListItem
+	Value   interface{}
+	Next    *ListItem
+	Prev    *ListItem
+	ItemKey Key // extra field for usage in cache
 }
 
 type list struct {
