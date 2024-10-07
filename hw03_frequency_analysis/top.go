@@ -1,45 +1,55 @@
 package hw03frequencyanalysis
 
 import (
+	"regexp"
 	"slices"
 	"strings"
 )
 
+var regWords = regexp.MustCompile(`(?:[a-zа-я]+[[:punct:]]*)+[a-zа-я]+`)
+
 func Top10(text string) []string {
+	text = strings.ToLower(text)
+	textSlc := strings.Fields(text)
 	freqMap := make(map[string]int)
 
-	textSlice := strings.Fields(text)
-	slices.Sort(textSlice)
+	for _, v := range textSlc {
+		if v == "-" {
+			continue
+		}
 
-	for _, val := range textSlice {
-		freqMap[val]++
+		switch {
+		case regWords.MatchString(v):
+			freqMap[regWords.FindString(v)]++
+		default:
+			freqMap[v]++
+		}
 	}
 
-	freqSlice := make([]int, 0, len(freqMap))
+	appearancesSlc := make([]int, 0, len(freqMap))
 
 	for _, val := range freqMap {
-		freqSlice = append(freqSlice, val)
+		appearancesSlc = append(appearancesSlc, val)
 	}
 
-	slices.SortFunc(freqSlice, func(a, b int) int {
+	slices.SortFunc(appearancesSlc, func(a, b int) int {
 		return b - a
 	})
-	freqSlice = freqSlice[:min(10, len(freqSlice))]
 
-	result := make([]string, 0, min(len(freqMap), 10))
-	box := make([]string, 0, cap(result))
+	resSlice := make([]string, 0, len(freqMap))
 
-	for i := 0; i < cap(result); {
+	for i := 0; i < min(len(appearancesSlc), 10); {
+		k := 0
+		check := appearancesSlc[i]
 		for key, val := range freqMap {
-			if val == freqSlice[i] {
-				box = append(box, key)
-				delete(freqMap, key)
+			if check == val {
+				resSlice = append(resSlice, key)
+				k++
 			}
 		}
-		slices.Sort(box)
-		result = append(result, box...)
-		i += len(box)
-		box = box[len(box):]
+		slices.Sort(resSlice[i:])
+		i += k
 	}
-	return result
+
+	return resSlice[:min(len(resSlice), 10)]
 }
