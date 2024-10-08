@@ -1,12 +1,16 @@
 package hw04lrucache
 
+import "sync"
+
 type Key string
 
 /*
 if ItemKey from ListItem (list.go) is removed:
-- comment lines 27, 32, 42, 50
-- uncomment the loop at lines 33-38
+- comment lines 33, 38, 48, 58
+- uncomment the loop at lines 39-44
 */
+
+var lock sync.RWMutex
 
 type Cache interface {
 	Set(key Key, value interface{}) bool
@@ -21,6 +25,8 @@ type lruCache struct {
 }
 
 func (l *lruCache) Set(key Key, val interface{}) bool {
+	lock.Lock()
+	defer lock.Unlock()
 	if _, ok := l.items[key]; ok {
 		l.items[key].Value = val
 		l.queue.MoveToFront(l.items[key])
@@ -45,6 +51,8 @@ func (l *lruCache) Set(key Key, val interface{}) bool {
 }
 
 func (l *lruCache) Get(key Key) (interface{}, bool) {
+	lock.RLock()
+	defer lock.RUnlock()
 	if item, ok := l.items[key]; ok {
 		l.queue.MoveToFront(l.items[key])
 		l.queue.Front().ItemKey = key
@@ -55,6 +63,8 @@ func (l *lruCache) Get(key Key) (interface{}, bool) {
 }
 
 func (l *lruCache) Clear() {
+	lock.Lock()
+	defer lock.Unlock()
 	l.queue = NewList()
 	l.items = make(map[Key]*ListItem, l.capacity)
 }
