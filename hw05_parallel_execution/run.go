@@ -19,7 +19,6 @@ func Run(tasks []Task, n, m int) error {
 	jobs := make(chan Task)
 	res := make(chan error, n)
 	done := make(chan struct{}, 1)
-	defer close(jobs)
 
 	for range n {
 		wg.Add(1)
@@ -29,13 +28,17 @@ func Run(tasks []Task, n, m int) error {
 	var errCounter, errReceived int
 	var jobsSent int
 
-	for range min(n, len(tasks)) {
+	for range min(n, len(tasks)) { // sends initial batch of jobs to workers
 		jobs <- tasks[jobsSent]
 		jobsSent++
 	}
 
-	for errReceived < len(tasks) {
-		if errCounter == m {
+	if m == 0 { // allows unlimited amount of errors if m == 0
+		m = -1
+	}
+
+	for errReceived < len(tasks) { // loop will close when we get all the results from workers
+		if errCounter == m { // check for error limit
 			close(done)
 			wg.Wait()
 			return ErrErrorsLimitExceeded
@@ -55,7 +58,6 @@ func Run(tasks []Task, n, m int) error {
 	}
 	close(done)
 	wg.Wait()
-	close(res)
 	return nil
 }
 
