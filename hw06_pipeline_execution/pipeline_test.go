@@ -150,6 +150,71 @@ func TestAllStageStop(t *testing.T) {
 		wg.Wait()
 
 		require.Len(t, result, 0)
+	})
+}
 
+func TestStopInTheMiddle(t *testing.T) {
+	start := time.Now()
+	wg := sync.WaitGroup{}
+	// Stage generator
+	g := func(_ string, f func(v interface{}) interface{}) Stage {
+		return func(in In) Out {
+			out := make(Bi)
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				defer close(out)
+				for v := range in {
+					time.Sleep(sleepPerStage)
+					out <- f(v)
+				}
+			}()
+			return out
+		}
+	}
+
+	stages := []Stage{
+		g("Multiplier (* 2)", func(v interface{}) interface{} { return v.(int) * 2 }),
+		g("Adder (+ 100)", func(v interface{}) interface{} { return v.(int) + 100 }),
+		g("Modulo (% 15)", func(v interface{}) interface{} { return v.(int) % 15 }),
+	}
+
+	t.Run("done case", func(t *testing.T) {
+		in := make(Bi)
+		done := make(Bi)
+		data := 100
+
+		// whole 100 jobs should take 0.1s*(100 jobs + 2 stages)=~10.2s
+		// aborting the task after 5s should result in 46-48 tasks completed
+		abortDur := sleepPerStage * 50
+		go func() {
+			<-time.After(abortDur)
+			close(done)
+		}()
+
+		go func() {
+			for v := range data {
+				in <- v % 37
+			}
+			close(in)
+		}()
+
+		result := make([]int, 0, data)
+		for s := range ExecutePipeline(in, done, stages...) {
+			result = append(result, s.(int))
+		}
+		elapsed := time.Since(start)
+
+		// got out of loop after ~5 seconds, while the entire job should take ~10 seconds
+		require.Less(t, int64(elapsed), int64(time.Second*5+fault))
+
+		// got at least 45 results before "done" signal was received
+		// linear execution with 3 stages would give us 5s/(3*0.1s)=~16-17 jobs completed
+		// so this >45 requirement also shows that it was done concurrently
+		require.Less(t, 45, len(result))
+
+		//	didn't do all 100 jobs
+		require.Less(t, len(result), data)
+		wg.Wait()
 	})
 }
