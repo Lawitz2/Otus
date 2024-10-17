@@ -22,9 +22,10 @@ func (l *list) Back() *ListItem {
 	return l.BackNode
 }
 
+// add a new node to the front of the list
 func (l *list) PushFront(v interface{}) *ListItem {
 	switch {
-	case l.ListLen == 0:
+	case l.ListLen == 0: // check if the list is empty
 		l.FrontNode = &ListItem{
 			Value: v,
 			Next:  nil,
@@ -43,9 +44,10 @@ func (l *list) PushFront(v interface{}) *ListItem {
 	return l.FrontNode
 }
 
+// add a new node to the back of the list
 func (l *list) PushBack(v interface{}) *ListItem {
 	switch {
-	case l.ListLen == 0:
+	case l.ListLen == 0: // check if the list is empty
 		l.BackNode = &ListItem{
 			Value: v,
 			Next:  nil,
@@ -64,6 +66,7 @@ func (l *list) PushBack(v interface{}) *ListItem {
 	return l.BackNode
 }
 
+// delete a specific node from the list
 func (l *list) Remove(i *ListItem) {
 	switch {
 	case l.Len() == 1: // if we're deleting the only item in the list
@@ -82,6 +85,7 @@ func (l *list) Remove(i *ListItem) {
 	l.ListLen--
 }
 
+// moves a specific node to the front of the list
 func (l *list) MoveToFront(i *ListItem) {
 	l.PushFront(i.Value)
 	l.Remove(i)

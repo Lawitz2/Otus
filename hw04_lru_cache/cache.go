@@ -24,17 +24,17 @@ type lruCache struct {
 	items    map[Key]*ListItem
 }
 
-func (l *lruCache) Set(key Key, val interface{}) bool {
+func (l *lruCache) Set(key Key, val interface{}) bool { // adds new value (or updates existing one) to cache based on key
 	lock.Lock()
 	defer lock.Unlock()
-	if _, ok := l.items[key]; ok {
+	if _, ok := l.items[key]; ok { // update value if the key already exists in cache
 		l.items[key].Value = val
 		l.queue.MoveToFront(l.items[key])
-		l.queue.Front().ItemKey = key
+		l.queue.Front().ItemKey = key // reassign the itemkey to the moved node since it's a node with a different pointer
 		l.items[key] = l.queue.Front()
 		return true
 	}
-	if l.queue.Len() == l.capacity {
+	if l.queue.Len() == l.capacity { // if cache is full - remove the least requested element
 		delete(l.items, l.queue.Back().ItemKey)
 		// for mapKey, item := range l.items {
 		//	if l.queue.Back() == item {
@@ -44,25 +44,25 @@ func (l *lruCache) Set(key Key, val interface{}) bool {
 		// }
 		l.queue.Remove(l.queue.Back())
 	}
-	l.queue.PushFront(val)
-	l.queue.Front().ItemKey = key
+	l.queue.PushFront(val)        // add new element to cache
+	l.queue.Front().ItemKey = key // reassign the itemkey to the moved node since it's a node with a different pointer
 	l.items[key] = l.queue.Front()
 	return false
 }
 
-func (l *lruCache) Get(key Key) (interface{}, bool) {
+func (l *lruCache) Get(key Key) (interface{}, bool) { // get a value from cache based on key
 	lock.RLock()
 	defer lock.RUnlock()
 	if item, ok := l.items[key]; ok {
 		l.queue.MoveToFront(l.items[key])
-		l.queue.Front().ItemKey = key
+		l.queue.Front().ItemKey = key // reassign the itemkey to the moved node since it's a node with a different pointer
 		l.items[key] = l.queue.Front()
 		return item.Value, ok
 	}
 	return nil, false
 }
 
-func (l *lruCache) Clear() {
+func (l *lruCache) Clear() { // fully clears the cache
 	lock.Lock()
 	defer lock.Unlock()
 	l.queue = NewList()
