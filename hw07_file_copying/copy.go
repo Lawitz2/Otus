@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log/slog"
 	"os"
 	"strings"
 )
@@ -20,7 +19,6 @@ var (
 func Copy(fromPath, toPath string, offset, limit int64) error {
 	fileDescr, err := os.Stat(from) // getting filesize.
 	if err != nil {
-		slog.Error(err.Error())
 		return ErrUnsupportedFile
 	}
 
@@ -37,14 +35,12 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 
 	targetFile, err := os.Open(fromPath)
 	if err != nil {
-		slog.Error(err.Error())
 		return ErrUnsupportedFile
 	}
 	defer targetFile.Close()
 
 	copyFile, err := os.Create(toPath)
 	if err != nil {
-		slog.Error(err.Error())
 		return ErrUnsupportedFile
 	}
 	defer copyFile.Close()
@@ -55,7 +51,6 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	// skip first n bytes based on offset value. 0 will have no effect.
 	_, err = reader.Discard(int(offset))
 	if err != nil {
-		slog.Error(err.Error())
 		return err
 	}
 
