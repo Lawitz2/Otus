@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//nolint:goconst
 func TestCopy(t *testing.T) {
 	from = ".\\testdata\\input.txt"
 	to = ".\\testdata\\output_test.txt"
