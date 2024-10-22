@@ -11,15 +11,13 @@ import (
 //nolint:goconst
 func TestCopy(t *testing.T) {
 	from = ".\\testdata\\input.txt"
-	to = ".\\testdata\\output.txt"
+	to = ".\\testdata\\output_test.txt"
+	inInfo, err := os.Stat(from)
+	if err != nil {
+		slog.Error(err.Error())
+		return
+	}
 	t.Run("just a file copy", func(t *testing.T) {
-
-		inInfo, err := os.Stat(from)
-		if err != nil {
-			slog.Error(err.Error())
-			return
-		}
-
 		err = Copy(from, to, 0, 0)
 		require.Nil(t, err)
 
@@ -36,7 +34,7 @@ func TestCopy(t *testing.T) {
 	t.Run("offset and limit", func(t *testing.T) {
 		offset = 150
 		limit = 500
-		inInfo, err := os.Stat(from)
+		inInfo, err = os.Stat(from)
 		if err != nil {
 			slog.Error(err.Error())
 			return
@@ -78,7 +76,7 @@ func TestCopy(t *testing.T) {
 		testE := ".\\testdata\\out_offset100_limit1000.txt"
 		testF := ".\\testdata\\out_offset6000_limit1000.txt"
 
-		err := Copy(from, to, 0, 0) // to out_offset0_limit0.txt
+		err = Copy(from, to, 0, 0) // to out_offset0_limit0.txt
 		require.Nil(t, err)
 		outInfo, _ := os.Stat(from)
 		exampleInfo, _ := os.Stat(testA)
@@ -124,9 +122,8 @@ func TestCopy(t *testing.T) {
 	t.Run("incorrect requests", func(t *testing.T) {
 		offset = 150
 		limit = 500
-		inInfo, _ := os.Stat(from)
 
-		err := Copy(from+"randomstuff", to, offset, limit) // trying to copy a non-existing file
+		err = Copy(from+"randomstuff", to, offset, limit) // trying to copy a non-existing file
 		require.Equal(t, err, ErrUnsupportedFile)
 
 		err = Copy(from, to, inInfo.Size()*2, limit) // offset higher than the whole file
