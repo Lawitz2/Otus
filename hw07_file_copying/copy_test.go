@@ -122,8 +122,6 @@ func TestCopy(t *testing.T) {
 	})
 
 	t.Run("incorrect requests", func(t *testing.T) {
-		from = ".\\testdata\\input.txt"
-		to = ".\\testdata\\output2.txt"
 		offset = 150
 		limit = 500
 		inInfo, _ := os.Stat(from)
