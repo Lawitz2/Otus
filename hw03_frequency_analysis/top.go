@@ -1,12 +1,18 @@
 package hw03frequencyanalysis
 
 import (
+	"cmp"
 	"regexp"
 	"slices"
 	"strings"
 )
 
 var regWords = regexp.MustCompile(`(?:[a-zа-я]+[[:punct:]]*)+[a-zа-я]+`)
+
+type word struct {
+	word  string
+	count int
+}
 
 func Top10(text string) []string {
 	text = strings.ToLower(text)
@@ -26,30 +32,26 @@ func Top10(text string) []string {
 		}
 	}
 
-	appearancesSlc := make([]int, 0, len(freqMap))
+	words := make([]word, 0, len(freqMap))
 
-	for _, val := range freqMap {
-		appearancesSlc = append(appearancesSlc, val)
+	for key, val := range freqMap {
+		words = append(words, word{
+			word:  key,
+			count: val,
+		})
 	}
 
-	slices.SortFunc(appearancesSlc, func(a, b int) int {
-		return b - a
+	slices.SortFunc(words, func(a, b word) int {
+		return cmp.Or(
+			cmp.Compare(b.count, a.count),
+			cmp.Compare(a.word, b.word))
 	})
 
-	resSlice := make([]string, 0, len(freqMap))
+	wordsOutput := make([]string, 0, min(len(words), 10))
 
-	for i := 0; i < min(len(appearancesSlc), 10); {
-		k := 0
-		check := appearancesSlc[i]
-		for key, val := range freqMap {
-			if check == val {
-				resSlice = append(resSlice, key)
-				k++
-			}
-		}
-		slices.Sort(resSlice[i:])
-		i += k
+	for _, w := range words[:min(len(words), 10)] {
+		wordsOutput = append(wordsOutput, w.word)
 	}
 
-	return resSlice[:min(len(resSlice), 10)]
+	return wordsOutput
 }
