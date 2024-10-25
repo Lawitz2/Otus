@@ -11,97 +11,100 @@ type List interface {
 }
 
 func (l *list) Len() int {
-	return l.ListLen
+	return l.listLen
 }
 
 func (l *list) Front() *ListItem {
-	return l.FrontNode
+	return l.frontNode
 }
 
 func (l *list) Back() *ListItem {
-	return l.BackNode
+	return l.backNode
 }
 
 // add a new node to the front of the list
 func (l *list) PushFront(v interface{}) *ListItem {
 	switch {
-	case l.ListLen == 0: // check if the list is empty
-		l.FrontNode = &ListItem{
-			Value: v,
-			Next:  nil,
-			Prev:  nil,
+	case l.listLen == 0: // check if the list is empty
+		l.frontNode = &ListItem{
+			value: v,
+			next:  nil,
+			prev:  nil,
 		}
-		l.BackNode = l.FrontNode
+		l.backNode = l.frontNode
 	default:
-		l.FrontNode.Prev = &ListItem{
-			Value: v,
-			Next:  l.FrontNode,
-			Prev:  nil,
+		l.frontNode.prev = &ListItem{
+			value: v,
+			next:  l.frontNode,
+			prev:  nil,
 		}
-		l.FrontNode = l.FrontNode.Prev
+		l.frontNode = l.frontNode.prev
 	}
-	l.ListLen++
-	return l.FrontNode
+	l.listLen++
+	return l.frontNode
 }
 
 // add a new node to the back of the list
 func (l *list) PushBack(v interface{}) *ListItem {
 	switch {
-	case l.ListLen == 0: // check if the list is empty
-		l.BackNode = &ListItem{
-			Value: v,
-			Next:  nil,
-			Prev:  nil,
+	case l.listLen == 0: // check if the list is empty
+		l.backNode = &ListItem{
+			value: v,
+			next:  nil,
+			prev:  nil,
 		}
-		l.FrontNode = l.BackNode
+		l.frontNode = l.backNode
 	default:
-		l.BackNode.Next = &ListItem{
-			Value: v,
-			Next:  nil,
-			Prev:  l.BackNode,
+		l.backNode.next = &ListItem{
+			value: v,
+			next:  nil,
+			prev:  l.backNode,
 		}
-		l.BackNode = l.BackNode.Next
+		l.backNode = l.backNode.next
 	}
-	l.ListLen++
-	return l.BackNode
+	l.listLen++
+	return l.backNode
 }
 
 // delete a specific node from the list
 func (l *list) Remove(i *ListItem) {
 	switch {
 	case l.Len() == 1: // if we're deleting the only item in the list
-		l.FrontNode = nil
-		l.BackNode = nil
-	case i.Next == nil: // if we're deleting the Back node
-		i.Prev.Next = nil
-		l.BackNode = i.Prev
-	case i.Prev == nil: // if we're deleting the Front node
-		i.Next.Prev = nil
-		l.FrontNode = i.Next
+		l.frontNode = nil
+		l.backNode = nil
+	case i.next == nil: // if we're deleting the Back node
+		i.prev.next = nil
+		l.backNode = i.prev
+	case i.prev == nil: // if we're deleting the Front node
+		i.next.prev = nil
+		l.frontNode = i.next
 	default: // If we're deleting a node from the middle
-		i.Next.Prev = i.Prev
-		i.Prev.Next = i.Next
+		i.next.prev = i.prev
+		i.prev.next = i.next
 	}
-	l.ListLen--
+	l.listLen--
 }
 
 // moves a specific node to the front of the list
 func (l *list) MoveToFront(i *ListItem) {
-	l.PushFront(i.Value)
+	if i == l.frontNode { // if trying to move the element that's already in front
+		return
+	}
+	l.PushFront(i.value)
 	l.Remove(i)
 }
 
 type ListItem struct {
-	Value   interface{}
-	Next    *ListItem
-	Prev    *ListItem
-	ItemKey Key // extra field for usage in cache
+	value   interface{}
+	next    *ListItem
+	prev    *ListItem
+	itemKey Key // extra field for usage in cache
 }
 
 type list struct {
-	FrontNode *ListItem
-	BackNode  *ListItem
-	ListLen   int
+	frontNode *ListItem
+	backNode  *ListItem
+	listLen   int
 }
 
 func NewList() List {

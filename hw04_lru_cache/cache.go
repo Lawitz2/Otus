@@ -4,12 +4,6 @@ import "sync"
 
 type Key string
 
-/*
-if ItemKey from ListItem (list.go) is removed:
-- comment lines 33, 38, 48, 58
-- uncomment the loop at lines 39-44
-*/
-
 type Cache interface {
 	Set(key Key, value interface{}) bool
 	Get(key Key) (interface{}, bool)
@@ -27,24 +21,18 @@ func (l *lruCache) Set(key Key, val interface{}) bool { // adds new value (or up
 	l.lock.Lock()
 	defer l.lock.Unlock()
 	if _, ok := l.items[key]; ok { // update value if the key already exists in cache
-		l.items[key].Value = val
+		l.items[key].value = val
 		l.queue.MoveToFront(l.items[key])
-		l.queue.Front().ItemKey = key // reassign the itemkey to the moved node since it's a node with a different pointer
+		l.queue.Front().itemKey = key // reassign the itemkey to the moved node since it's a node with a different pointer
 		l.items[key] = l.queue.Front()
 		return true
 	}
 	if l.queue.Len() == l.capacity { // if cache is full - remove the least requested element
-		delete(l.items, l.queue.Back().ItemKey)
-		// for mapKey, item := range l.items {
-		//	if l.queue.Back() == item {
-		//		delete(l.items, mapKey)
-		//		break
-		//	}
-		// }
+		delete(l.items, l.queue.Back().itemKey)
 		l.queue.Remove(l.queue.Back())
 	}
 	l.queue.PushFront(val)        // add new element to cache
-	l.queue.Front().ItemKey = key // reassign the itemkey to the moved node since it's a node with a different pointer
+	l.queue.Front().itemKey = key // reassign the itemkey to the moved node since it's a node with a different pointer
 	l.items[key] = l.queue.Front()
 	return false
 }
@@ -54,9 +42,9 @@ func (l *lruCache) Get(key Key) (interface{}, bool) { // get a value from cache 
 	defer l.lock.RUnlock()
 	if item, ok := l.items[key]; ok {
 		l.queue.MoveToFront(l.items[key])
-		l.queue.Front().ItemKey = key // reassign the itemkey to the moved node since it's a node with a different pointer
+		l.queue.Front().itemKey = key // reassign the itemkey to the moved node since it's a node with a different pointer
 		l.items[key] = l.queue.Front()
-		return item.Value, ok
+		return item.value, ok
 	}
 	return nil, false
 }
