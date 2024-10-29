@@ -14,7 +14,7 @@ type lruCache struct {
 	capacity int
 	queue    List
 	items    map[Key]*ListItem
-	lock     sync.RWMutex
+	lock     sync.Mutex
 }
 
 func (l *lruCache) Set(key Key, val interface{}) bool { // adds new value (or updates existing one) to cache based on key
@@ -38,8 +38,8 @@ func (l *lruCache) Set(key Key, val interface{}) bool { // adds new value (or up
 }
 
 func (l *lruCache) Get(key Key) (interface{}, bool) { // get a value from cache based on key
-	l.lock.RLock()
-	defer l.lock.RUnlock()
+	l.lock.Lock()
+	defer l.lock.Unlock()
 	if item, ok := l.items[key]; ok {
 		l.queue.MoveToFront(l.items[key])
 		l.queue.Front().itemKey = key // reassign the itemkey to the moved node since it's a node with a different pointer
@@ -61,6 +61,6 @@ func NewCache(capacity int) Cache {
 		capacity: capacity,
 		queue:    NewList(),
 		items:    make(map[Key]*ListItem, capacity),
-		lock:     sync.RWMutex{},
+		lock:     sync.Mutex{},
 	}
 }
