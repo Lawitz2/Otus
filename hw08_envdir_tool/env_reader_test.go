@@ -11,7 +11,7 @@ func TestReadDir(t *testing.T) {
 		// folder contains 5 env files, one of which is empty and should be excluded
 		// end result is expected to be 4 env variables in a map with no error
 		t.Parallel()
-		input := ".\\testdata\\env"
+		input := "./testdata/env"
 		dir, err := ReadDir(input)
 		require.Nil(t, err)
 		require.Equal(t, 4, len(dir))
