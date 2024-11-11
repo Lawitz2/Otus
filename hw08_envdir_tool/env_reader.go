@@ -42,7 +42,8 @@ func ReadDir(dirPath string) (Environment, error) {
 		scanner := bufio.NewScanner(f)
 		scanner.Scan()
 
-		ev.Value = string(bytes.Replace([]byte(scanner.Text()), []byte{0}, []byte{10}, -1))
+		ev.Value = string(bytes.ReplaceAll([]byte(scanner.Text()), []byte{0}, []byte{10}))
+		ev.Value = strings.TrimRight(ev.Value, "\t ")
 
 		env[f.Name()] = ev
 	}
