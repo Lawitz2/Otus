@@ -10,7 +10,7 @@ func TestRunCmd(t *testing.T) {
 	// successful execution should return exit code 0
 	t.Run("bash", func(t *testing.T) {
 		cmd := []string{"bash"}
-		env, _ := ReadDir(".\\testdata\\env")
+		env, _ := ReadDir(`.\testdata\env\`)
 		exitCode := RunCmd(cmd, env)
 		require.Equal(t, 0, exitCode)
 	})
