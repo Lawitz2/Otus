@@ -45,14 +45,13 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	}
 	defer copyFile.Close()
 
-	reader := bufio.NewReader(targetFile)
-	writer := bufio.NewWriter(copyFile)
-
-	// skip first n bytes based on offset value. 0 will have no effect.
-	_, err = reader.Discard(int(offset))
+	_, err = targetFile.Seek(offset, 0)
 	if err != nil {
 		return err
 	}
+
+	reader := bufio.NewReader(targetFile)
+	writer := bufio.NewWriter(copyFile)
 
 	// the following math allows me to have nil error after successful copy.
 	var size int64
@@ -68,6 +67,10 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	// One part of the multiwriter is writing data into the new file.
 	// The other one feeds data into progress bar for progress tracking.
 	_, err = io.CopyN(io.MultiWriter(writer, prBar), reader, size)
+	if err != nil {
+		return err
+	}
+
 	writer.Flush()
 
 	fmt.Println("\ndone!")
