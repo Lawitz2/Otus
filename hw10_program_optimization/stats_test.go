@@ -1,3 +1,4 @@
+//go:build !bench
 // +build !bench
 
 package hw10programoptimization
@@ -36,4 +37,6 @@ func TestGetDomainStat(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, DomainStat{}, result)
 	})
+
+	// TODO: MORE TESTS
 }
