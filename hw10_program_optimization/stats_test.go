@@ -1,7 +1,7 @@
 //go:build !bench
 // +build !bench
 
-package hw10programoptimization
+package main
 
 import (
 	"bytes"
@@ -38,5 +38,24 @@ func TestGetDomainStat(t *testing.T) {
 		require.Equal(t, DomainStat{}, result)
 	})
 
-	// TODO: MORE TESTS
+	t.Run("json with no Email", func(t *testing.T) {
+		input := `{"Id":1,"Name":"Howard Mendoza","Username":"0Oliver","Email":"","Phone":"6-866-899-36-79","Password":"InAQJvsq","Address":"Blackbird Place 25"}`
+		res, err := GetDomainStat(bytes.NewBufferString(input), "gov")
+		require.NoError(t, err)
+		require.Equal(t, DomainStat{}, res)
+	})
+
+	t.Run("json with emails in different fields", func(t *testing.T) {
+		input := `{"Id":1,"Name":"ea@Browsedrive.gov","Username":"ea@Browsedrive.gov","Email":"ea@Browsedrive.gov","Phone":"ea@Browsedrive.gov","Password":"ea@Browsedrive.gov","Address":"ea@Browsedrive.gov"}`
+		res, err := GetDomainStat(bytes.NewBufferString(input), "gov")
+		require.NoError(t, err)
+		require.Equal(t, DomainStat{"browsedrive.gov": 1}, res)
+	})
+
+	t.Run("bad Json", func(t *testing.T) {
+		input := `{i am not a real json}`
+		res, err := GetDomainStat(bytes.NewBufferString(input), "gov")
+		require.Error(t, err)
+		require.Nil(t, res)
+	})
 }
