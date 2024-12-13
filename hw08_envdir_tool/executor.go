@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"log/slog"
 	"os"
 	"os/exec"
@@ -26,9 +25,9 @@ func RunCmd(cmd []string, env Environment) int {
 		}
 	}
 	err := c.Run()
-	fmt.Printf("command output:\n%s", stdout.String())
+	//fmt.Printf("command output:\n%s", stdout.String())
 	if err != nil {
-		fmt.Printf("error output:\n%s", stderr.String())
+		//fmt.Printf("error output:\n%s", stderr.String())
 		slog.Error(err.Error())
 	}
 	return c.ProcessState.ExitCode()
