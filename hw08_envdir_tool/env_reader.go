@@ -46,13 +46,14 @@ func ReadDir(dirPath string) (Environment, error) {
 		ev.Value = strings.TrimRight(ev.Value, "\t ")
 
 		env[f.Name()] = ev
+		f.Close()
 	}
 
-	for key, val := range env {
-		if val.NeedRemove {
-			delete(env, key)
-		}
-	}
+	//for key, val := range env {
+	//	if val.NeedRemove {
+	//		delete(env, key)
+	//	}
+	//}
 
 	return env, nil
 }
