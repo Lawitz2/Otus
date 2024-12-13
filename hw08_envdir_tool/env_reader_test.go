@@ -14,7 +14,7 @@ func TestReadDir(t *testing.T) {
 		input := "./testdata/env"
 		dir, err := ReadDir(input)
 		require.Nil(t, err)
-		require.Equal(t, 4, len(dir))
+		require.Equal(t, 5, len(dir))
 		require.Equal(t, dir["HELLO"].Value, `"hello"`)
 		require.Equal(t, dir["UNSET"].Value, "")
 	})
