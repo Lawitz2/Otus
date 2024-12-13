@@ -20,9 +20,11 @@ func RunCmd(cmd []string, env Environment) int {
 	//}
 	//c.Env = append(c.Env, envSlice...)
 	for k, v := range env {
-		if !v.NeedRemove {
-			os.Setenv(k, v.Value)
+		if v.NeedRemove {
+			os.Unsetenv(k)
+			continue
 		}
+		os.Setenv(k, v.Value)
 	}
 	err := c.Run()
 	//fmt.Printf("command output:\n%s", stdout.String())
