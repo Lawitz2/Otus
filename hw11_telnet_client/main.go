@@ -15,32 +15,31 @@ var wg sync.WaitGroup
 
 func main() {
 	slog.SetLogLoggerLevel(slog.LevelDebug)
-	wg.Add(1)
 	go tcpserver()
 
-	tc := NewTelnetClient("localhost:81", time.Second*15, os.Stdin, os.Stdout)
-	wg.Add(1)
-	tc.Connect()
-	go tc.Send()
-	go tc.Receive()
+	tc := NewTelnetClient("localhost:8103", time.Second*15, os.Stdin, os.Stdout)
+	err := tc.Connect()
+	if err != nil {
+		slog.Error("couldn't connect", "err", err.Error())
+		return
+	}
 
 	done := make(chan os.Signal, 1)
 	go func() {
 		signal.Notify(done, syscall.SIGINT)
 		<-done
-		slog.Info("received interrupt signal")
 		tc.Close()
-		os.Exit(0)
 	}()
 
+	wg.Add(2)
+	go tc.Send()
+	go tc.Receive()
+
 	wg.Wait()
-	//time.Sleep(time.Second * 2)
 }
 
 func tcpserver() {
-	defer wg.Done()
-
-	listener, err := net.Listen("tcp", `localhost:81`)
+	listener, err := net.Listen("tcp", "localhost:8103")
 	if err != nil {
 		slog.Error(err.Error())
 		return
@@ -57,13 +56,14 @@ func tcpserver() {
 			buf := make([]byte, 4096)
 			for {
 				n, err := conn.Read(buf)
+				conn.Write([]byte("your message was received by the server\n"))
 				slog.Info("server received " + strconv.Itoa(n) + " bytes")
 				slog.Debug(string(buf))
 				if err != nil {
 					slog.Error("server error", "err", err.Error())
 					return
 				}
-				time.Sleep(time.Second / 10)
+				time.Sleep(time.Millisecond * 100)
 				conn.Close()
 			}
 		}()
