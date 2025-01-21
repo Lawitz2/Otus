@@ -1,0 +1,14 @@
+goarch: amd64
+pkg: github.com/Lawitz2/Otus/hw10_program_optimization
+cpu: Genuine Intel(R) CPU 0000 @ 2.10GHz
+                 │   old.txt   │               new.txt               │
+                 │   sec/op    │   sec/op     vs base                │
+GetDomainStat-16   478.2m ± 1%   131.8m ± 0%  -72.44% (p=0.000 n=10)
+
+                 │    old.txt     │               new.txt                │
+                 │      B/op      │     B/op      vs base                │
+GetDomainStat-16   308.372Mi ± 0%   3.787Mi ± 0%  -98.77% (p=0.000 n=10)
+
+                 │   old.txt    │               new.txt               │
+                 │  allocs/op   │  allocs/op   vs base                │
+GetDomainStat-16   3045.4k ± 0%   172.1k ± 0%  -94.35% (p=0.000 n=10)

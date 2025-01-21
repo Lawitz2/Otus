@@ -1,0 +1,14 @@
+﻿goos: windows
+goarch: amd64
+pkg: github.com/Lawitz2/Otus/hw10_program_optimization
+cpu: Genuine Intel(R) CPU 0000 @ 2.10GHz
+BenchmarkGetDomainStat-16    	       3	 484879800 ns/op	323372224 B/op	 3045406 allocs/op
+BenchmarkGetDomainStat-16    	       2	 505468650 ns/op	323370544 B/op	 3045404 allocs/op
+BenchmarkGetDomainStat-16    	       3	 476439133 ns/op	323346133 B/op	 3045403 allocs/op
+BenchmarkGetDomainStat-16    	       3	 478652567 ns/op	323334640 B/op	 3045400 allocs/op
+BenchmarkGetDomainStat-16    	       3	 477772533 ns/op	323333610 B/op	 3045401 allocs/op
+BenchmarkGetDomainStat-16    	       3	 480368433 ns/op	323308773 B/op	 3045399 allocs/op
+BenchmarkGetDomainStat-16    	       3	 475814933 ns/op	323357813 B/op	 3045401 allocs/op
+BenchmarkGetDomainStat-16    	       3	 474515300 ns/op	323345850 B/op	 3045402 allocs/op
+BenchmarkGetDomainStat-16    	       3	 475997633 ns/op	323432250 B/op	 3045408 allocs/op
+BenchmarkGetDomainStat-16    	       3	 480222133 ns/op	323469424 B/op	 3045412 allocs/op
