@@ -27,11 +27,13 @@ type TelnetCl struct {
 }
 
 func (t *TelnetCl) Connect() error {
-	tcpConn, err := net.DialTimeout("tcp", t.address, t.timeout)
+	dialer := net.Dialer{Timeout: t.timeout}
+	tcpConn, err := dialer.Dial("tcp", t.address)
 	if err != nil {
 		return err
 	}
 	t.conn = tcpConn
+
 	return nil
 }
 

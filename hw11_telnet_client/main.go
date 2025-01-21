@@ -1,24 +1,43 @@
 package main
 
 import (
+	"flag"
 	"log/slog"
-	"net"
 	"os"
 	"os/signal"
-	"strconv"
 	"sync"
 	"syscall"
 	"time"
 )
 
+var timeout string
+
 var wg sync.WaitGroup
 
-func main() {
-	slog.SetLogLoggerLevel(slog.LevelDebug)
-	go tcpserver()
+func init() {
+	flag.StringVar(&timeout, "timeout", "15s", "set connection timeout. default value is 15s")
+}
 
-	tc := NewTelnetClient("localhost:8103", time.Second*15, os.Stdin, os.Stdout)
-	err := tc.Connect()
+func main() {
+	flag.Parse()
+
+	if len(os.Args) < 3 || len(os.Args) > 4 {
+		slog.Error("incorrect input, use format `go-telnet --timeout=10s host port` (timeout flag is optional)")
+		return
+	}
+
+	host := os.Args[len(os.Args)-2]
+	port := os.Args[len(os.Args)-1]
+	addr := host + ":" + port
+
+	t, err := time.ParseDuration(timeout)
+	if err != nil {
+		slog.Error("couldn't parse the timeout value", "err", err.Error())
+		return
+	}
+
+	tc := NewTelnetClient(addr, t, os.Stdin, os.Stdout)
+	err = tc.Connect()
 	if err != nil {
 		slog.Error("couldn't connect", "err", err.Error())
 		return
@@ -36,36 +55,4 @@ func main() {
 	go tc.Receive()
 
 	wg.Wait()
-}
-
-func tcpserver() {
-	listener, err := net.Listen("tcp", "localhost:8103")
-	if err != nil {
-		slog.Error(err.Error())
-		return
-	}
-	defer listener.Close()
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			slog.Error(err.Error())
-			return
-		}
-		go func() {
-			slog.Info("received connection", "source", conn.RemoteAddr())
-			buf := make([]byte, 4096)
-			for {
-				n, err := conn.Read(buf)
-				conn.Write([]byte("your message was received by the server\n"))
-				slog.Info("server received " + strconv.Itoa(n) + " bytes")
-				slog.Debug(string(buf))
-				if err != nil {
-					slog.Error("server error", "err", err.Error())
-					return
-				}
-				time.Sleep(time.Millisecond * 100)
-				conn.Close()
-			}
-		}()
-	}
 }
