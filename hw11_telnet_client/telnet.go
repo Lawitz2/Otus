@@ -27,8 +27,7 @@ type TelnetCl struct {
 }
 
 func (t *TelnetCl) Connect() error {
-	dialer := net.Dialer{Timeout: t.timeout}
-	tcpConn, err := dialer.Dial("tcp", t.address)
+	tcpConn, err := net.DialTimeout("tcp", t.address, t.timeout)
 	if err != nil {
 		return err
 	}
@@ -70,16 +69,19 @@ func (t *TelnetCl) Send() error {
 
 func (t *TelnetCl) Receive() error {
 	defer wg.Done()
-	scanner := bufio.NewScanner(t.conn)
+	reader := bufio.NewReader(t.conn)
 	for {
 		select {
 		case <-t.ctx.Done():
 			return nil
 		default:
-			if !scanner.Scan() {
-				return scanner.Err()
+			s, err := reader.ReadString('\n')
+			if err != nil {
+				t.ctxCanc() // Сервер закрыл соединение - завершаем работу
+				return err
 			}
-			t.out.Write([]byte(scanner.Text() + "\n"))
+
+			t.out.Write([]byte(s))
 		}
 	}
 }
@@ -102,7 +104,7 @@ func stdin(input io.ReadCloser, addr string) chan string {
 		defer close(in)
 		sc := bufio.NewScanner(input)
 		for sc.Scan() {
-			in <- sc.Text()
+			in <- sc.Text() + "\n"
 		}
 		if !sc.Scan() && sc.Err() == nil {
 			slog.Info("terminating connection to " + addr)
